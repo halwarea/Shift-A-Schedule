@@ -2,42 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"
+  >
+
   <title>JDCC Shift A Schedule</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
+      background: white;
+      overflow: hidden;
+    }
+
+    #screen {
+      position: fixed;
+      inset: 0;
       overflow: hidden;
       background: white;
     }
 
-    .viewer {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100dvh;
-      overflow: hidden;
-    }
+    #excel {
+      position: absolute;
+      top: 0;
+      left: 0;
 
-    iframe {
+      /*
+        Excel is given a desktop-sized canvas.
+        JavaScript below shrinks that entire canvas
+        to fit the phone's actual width.
+      */
+      width: 1650px;
+      height: 1800px;
+
       border: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
+      transform-origin: top left;
     }
   </style>
 </head>
 
 <body>
-  <div class="viewer">
+
+  <div id="screen">
     <iframe
+      id="excel"
       src="https://1drv.ms/x/c/53a5f839f0798ecf/IQSOzO4WcyvLT5tvWQ1aAzDpAbXxAIigXprsZ6DPB5n3cqQ?wdAllowInteractivity=False&Item=%27Shift%20A%20-%20Schedule%27!A1%3AAM82&wdHideGridlines=True&wdHideHeaders=True&wdHideSheetTabs=True"
       allowfullscreen>
     </iframe>
   </div>
+
+  <script>
+    function fitSchedule() {
+      const iframe = document.getElementById("excel");
+
+      const scheduleWidth = 1650;
+      const screenWidth = window.innerWidth;
+
+      // On phones/tablets, shrink the whole Excel viewer.
+      // On large screens, don't enlarge it past 100%.
+      const scale = Math.min(screenWidth / scheduleWidth, 1);
+
+      iframe.style.transform = `scale(${scale})`;
+
+      // Make the unscaled iframe tall enough so that,
+      // after shrinking, it still fills the screen vertically.
+      iframe.style.height = `${window.innerHeight / scale}px`;
+    }
+
+    fitSchedule();
+
+    window.addEventListener("resize", fitSchedule);
+    window.addEventListener("orientationchange", () => {
+      setTimeout(fitSchedule, 150);
+    });
+  </script>
+
 </body>
 </html>
